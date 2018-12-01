@@ -1,0 +1,40 @@
+apply plugin: 'org.hidetake.ssh'
+
+// https://gradle-ssh-plugin.github.io/docs/
+
+remotes {
+  rbpi0w {
+    host = '192.168.0.119'
+    user = 'pi'
+    password = 'raspberry'
+    //identity = file('/home/lion/.ssh/id_rsa')
+  }
+}
+
+task deploy(dependsOn: publish) {
+  group = 'application'
+  doLast {
+    ssh.run {
+      session(remotes.rbpi0w) {
+        def remoteDestDir = ['Java', rootProject.name].join(File.separator)
+        def sourceArtifact = [rootProject.publishDir, jar.archiveName].join(File.separator)
+        put from: sourceArtifact, into: remoteDestDir
+        put from: rootProject.publishLibsDir, into: remoteDestDir
+        put from: rootProject.publishScriptsDir, into: remoteDestDir
+        //executeSudo "java -jar Java/$rootProject.name/$rootProject.jar.archiveName"//, ignoreError: true
+      }
+    }
+  }
+}
+
+task deployProgs(dependsOn: publish) {
+  group = 'application'
+  doLast {
+    ssh.run {
+      session(remotes.rbpi0w) {
+        def remoteDestDir = ['Java', rootProject.name].join(File.separator)
+        put from: rootProject.publishScriptsDir, into: remoteDestDir
+      }
+    }
+  }
+}

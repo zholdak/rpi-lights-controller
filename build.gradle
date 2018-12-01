@@ -1,0 +1,99 @@
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'org.hidetake:gradle-ssh-plugin:2.9.0'
+  }
+}
+
+ext {
+  libsDir = 'libs'
+  scriptsDir = 'src/main/groovy/lsprogs'
+
+  srcScriptsDir = file([projectDir, scriptsDir].join(File.separator))
+
+  publishDir = file([buildDir, 'publish'].join(File.separator))
+  publishLibsDir = file([publishDir, libsDir].join(File.separator))
+  publishScriptsDir = file([publishDir, 'lsprogs'].join(File.separator))
+
+  deployGradle = file('deploy.gradle')
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+group = 'com.zholdak.rbpi'
+version = '0.0.1'
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  jcenter()
+  maven {
+    url 'https://oss.sonatype.org/content/groups/public'
+  }
+}
+
+dependencies {
+  compile('com.diozero:diozero-core:0.11')
+  compile('com.diozero:diozero-ws281x-java:0.11')
+  compile('org.codehaus.groovy:groovy-jsr223:2.5.2')
+  compile('org.tinylog:tinylog:1.3.5')
+  compileOnly('org.projectlombok:lombok:1.18.2')
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.debugOptions.debugLevel = "source,lines,vars"
+compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
+
+mainClassName = 'com.zholdak.rbpi.lightscontroller.LightsControllerApplication'
+
+jar {
+  manifest {
+    attributes(
+        'Implementation-Title': project.name,
+        'Implementation-Version': project.version,
+        'Implementation-Vendor': 'com.zholdak',
+        'Built-By': System.getProperty('user.name'),
+        'Built-JDK': System.getProperty('java.version'),
+        'Source-Compatibility': project.sourceCompatibility,
+        'Target-Compatibility': project.targetCompatibility,
+        'Build-Time-ISO-8601': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+        'Main-Class': mainClassName,
+        'Class-Path': configurations.compile.collect { ['.','libs',it.getName()].join(File.separator) }.join(' ')
+    )
+  }
+}
+
+task copyLibs(type: Copy) {
+    from configurations.runtime
+    into publishLibsDir
+}
+
+task copyScripts(type: Copy) {
+  from srcScriptsDir
+  into publishScriptsDir
+}
+
+task copyJar(type: Copy) {
+    from jar
+    into publishDir
+}
+
+task publish {
+  description= 'Publish entire application'
+  group = 'application'
+}
+publish.dependsOn build
+publish.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('copy') }
+}
+
+if (deployGradle.with { exists() && isFile() }) {
+  apply from: deployGradle
+}
