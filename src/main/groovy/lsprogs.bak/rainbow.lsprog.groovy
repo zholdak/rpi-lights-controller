@@ -1,4 +1,4 @@
-package scripts.lsprogs._
+package lsprogs
 
 import com.zholdak.rbpi.lightscontroller.program.LedStripProgram
 
@@ -19,6 +19,10 @@ class RainbowProgram extends LedStripProgram {
     if (leds.numPixels % 2 != 0) {
       "This program supports only strips with even number of leds"
     }
+  }
+
+  void clean() throws Exception {
+    ledDriver.allOff()
   }
 
   /**

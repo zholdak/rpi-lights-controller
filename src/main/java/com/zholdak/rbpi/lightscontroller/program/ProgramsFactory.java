@@ -203,6 +203,7 @@ public final class ProgramsFactory {
 	 *
 	 */
 	public void start() {
+		debug("Begin watching for programs ...");
 		while (true) {
 			Collection<ProgramListEntry> programsList = getPrograms();
 			if (programsList.isEmpty()) {

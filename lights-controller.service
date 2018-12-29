@@ -1,0 +1,20 @@
+# https://medium.com/@sulmansarwar/run-your-java-application-as-a-service-on-ubuntu-544531bd6102
+#
+# sudo ln -s /opt/lights-controller/lights-controller.service /etc/systemd/system/lights-controller.service
+# sudo systemctl daemon-reload
+# sudo systemctl enable lights-controller
+# sudo systemctl start | stop | status
+
+[Unit]
+Description=Lights Controller
+
+[Service]
+User=pi
+WorkingDirectory=/opt/lights-controller
+ExecStart=/opt/lights-controller/lights-controller.sh
+Restart=on-failure
+TimeoutStopSec=10
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

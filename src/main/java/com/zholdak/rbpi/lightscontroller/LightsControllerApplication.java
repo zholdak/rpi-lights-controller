@@ -9,6 +9,7 @@ import static com.zholdak.rbpi.lightscontroller.hardware.HardwareManager.hardwar
 import static com.zholdak.rbpi.lightscontroller.program.ProgramsFactory.programsFactory;
 import static java.lang.Runtime.getRuntime;
 import static org.pmw.tinylog.Configurator.defaultConfig;
+import static org.pmw.tinylog.Logger.debug;
 import static org.pmw.tinylog.Logger.info;
 import static org.pmw.tinylog.Logger.trace;
 
@@ -19,13 +20,13 @@ public class LightsControllerApplication {
 
 	static {
 		defaultConfig()
-				.level(Level.DEBUG)
+//				.level(Level.INFO)
 				.formatPattern("{date:HH:mm:ss.SSS} {level} [{file}:{line}] {message}")
 				.activate();
 	}
 
 	public static void main(String[] args) {
-		info("Application starting ...");
+		debug("Application starting ...");
 		new LightsControllerApplication().go();
 	}
 
@@ -39,6 +40,7 @@ public class LightsControllerApplication {
 		trace("Adding shutdown hook for correct application finalization");
 		getRuntime().addShutdownHook(new LightsControllerApplicationShutdownHook());
 
+		debug("Starting programs factory ...");
 		programsFactory().start();
 	}
 

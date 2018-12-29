@@ -140,4 +140,13 @@ public abstract class LedStripProgram {
 	public void terminate() {
 		this.terminateRequested = true;
 	}
+
+	/**
+	 * Wait for specified milliseconds
+	 *
+	 * @param millis of seconds
+	 */
+	public static void delay(int millis) {
+		try { Thread.sleep(millis); }  catch (InterruptedException e) { }
+	}
 }

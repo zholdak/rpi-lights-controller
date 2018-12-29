@@ -16,7 +16,7 @@ task deploy(dependsOn: publish) {
   doLast {
     ssh.run {
       session(remotes.rbpi0w) {
-        def remoteDestDir = ['Java', rootProject.name].join(File.separator)
+        def remoteDestDir = ['', 'opt', rootProject.name].join(File.separator)
         def sourceArtifact = [rootProject.publishDir, jar.archiveName].join(File.separator)
         put from: sourceArtifact, into: remoteDestDir
         put from: rootProject.publishLibsDir, into: remoteDestDir
@@ -32,7 +32,7 @@ task deployProgs(dependsOn: publish) {
   doLast {
     ssh.run {
       session(remotes.rbpi0w) {
-        def remoteDestDir = ['Java', rootProject.name].join(File.separator)
+        def remoteDestDir = ['', 'opt', rootProject.name].join(File.separator)
         put from: rootProject.publishScriptsDir, into: remoteDestDir
       }
     }
